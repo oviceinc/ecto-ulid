@@ -3,6 +3,7 @@ defmodule Ecto.ULIDTest do
 
   @binary <<1, 95, 194, 60, 108, 73, 209, 114, 136, 236, 133, 115, 106, 195, 145, 22>>
   @encoded "01BZ13RV29T5S8HV45EDNC748P"
+  @encoded_uuid "015fc23c-6c49-d172-88ec-85736ac39116"
 
   # generate/0
 
@@ -43,6 +44,11 @@ defmodule Ecto.ULIDTest do
     assert ulid == @encoded
   end
 
+  test "cast/1 returns valid ULID when a UUID encoded string is passed" do
+    {:ok, ulid} = Ecto.ULID.cast(@encoded)
+    assert {:ok, ^ulid} = Ecto.ULID.cast(@encoded_uuid)
+  end
+
   test "cast/1 returns ULID for encoding of correct length" do
     {:ok, ulid} = Ecto.ULID.cast("00000000000000000000000000")
     assert ulid == "00000000000000000000000000"
@@ -76,6 +82,18 @@ defmodule Ecto.ULIDTest do
     assert Ecto.ULID.cast("$0000000000000000000000000") == :error
   end
 
+  test "cast/1 returns error when UUID encoding is too short" do
+    assert Ecto.ULID.cast("015fc23c-6c49-d172-88ec-85736ac3911") == :error
+  end
+
+  test "cast/1 returns error when UUID encoding is too long" do
+    assert Ecto.ULID.cast("015fc23c-6c49-d172-88ec-85736ac391166") == :error
+  end
+
+  test "cast/1 returns error for invalid UUID encoding" do
+    assert Ecto.ULID.cast("z15fc23c-6c49-d172-88ec-85736ac39116") == :error
+  end
+
   # dump/1
 
   test "dump/1 dumps valid ULID to binary" do
@@ -86,6 +104,12 @@ defmodule Ecto.ULIDTest do
   test "dump/1 dumps encoding of correct length" do
     {:ok, bytes} = Ecto.ULID.dump("00000000000000000000000000")
     assert bytes == <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
+  end
+
+  test "dump/1 dumps valid UUID hex representation to binary" do
+    {:ok, bytes_1} = Ecto.ULID.dump(@encoded)
+    {:ok, bytes_2} = Ecto.ULID.dump(@encoded_uuid)
+    assert bytes_1 == bytes_2
   end
 
   test "dump/1 returns error when encoding is too short" do

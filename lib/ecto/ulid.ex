@@ -15,7 +15,7 @@ defmodule Ecto.ULID do
   def type, do: :uuid
 
   @doc """
-  Casts a string to ULID.
+  Casts a string (including a UUID hex string) to ULID.
   """
   def cast(<<_::bytes-size(26)>> = value) do
     if valid?(value) do
@@ -24,6 +24,17 @@ defmodule Ecto.ULID do
       :error
     end
   end
+
+  def cast(<<_::bytes-size(36)>> = value) do
+    with {:ok, hex_uuid} <- Ecto.UUID.cast(value),
+         {:ok, decoded} <- dump(hex_uuid),
+         {:ok, ulid} <- load(decoded) do
+      {:ok, ulid}
+    else
+      :error -> :error
+    end
+  end
+
   def cast(_), do: :error
 
   @doc """
@@ -37,10 +48,10 @@ defmodule Ecto.ULID do
   end
 
   @doc """
-  Converts a Crockford Base32 encoded ULID into a binary.
+  Converts a Crockford Base32 or UUID hex encoded ULID  into a binary.
   """
   def dump(<<_::bytes-size(26)>> = encoded), do: decode(encoded)
-  def dump(_), do: :error
+  defdelegate dump(encoded), to: Ecto.UUID
 
   @doc """
   Converts a binary ULID into a Crockford Base32 encoded string.
