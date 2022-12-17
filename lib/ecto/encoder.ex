@@ -5,8 +5,6 @@ defmodule Ecto.ULID.Encoder do
 
   alias Ecto.ULID
 
-  @crockford_alphabet "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-
   @doc """
   Encodes a Ulid binary to its textual form.
 
@@ -44,7 +42,7 @@ defmodule Ecto.ULID.Encoder do
 
   for n <- 0..31 do
     defp encode_bytes(<<unquote(n)::unsigned-size(5), rest::bitstring>>, acc) do
-      encode_bytes(rest, acc <> unquote(String.at(@crockford_alphabet, n)))
+      encode_bytes(rest, acc <> unquote(String.at(ULID.crockford_alphabet(), n)))
     end
   end
 

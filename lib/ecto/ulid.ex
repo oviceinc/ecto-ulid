@@ -5,6 +5,8 @@ defmodule Ecto.ULID do
 
   alias Ecto.ULID.{Encoder, Decoder}
 
+  @crockford_alphabet "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+
   # replace with `use Ecto.Type` after Ecto 3.2.0 is required
   @behaviour Ecto.Type
   # and remove both of these functions
@@ -30,6 +32,9 @@ defmodule Ecto.ULID do
   The underlying schema type.
   """
   def type, do: :uuid
+
+  @spec crockford_alphabet() :: String.t()
+  def crockford_alphabet, do: @crockford_alphabet
 
   @doc """
   Casts a string (including a UUID hex string) to ULID.

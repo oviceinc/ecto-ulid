@@ -5,8 +5,6 @@ defmodule Ecto.ULID.Decoder do
 
   alias Ecto.ULID
 
-  @crockford_alphabet "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
-
   @spec decode(ULID.t()) :: {:ok, ULID.raw()} | :error
   def decode(<<_::unsigned-size(208)>> = text) do
     decode_bytes(text, <<>>)
@@ -44,7 +42,7 @@ defmodule Ecto.ULID.Decoder do
   @compile {:inline, i: 1}
 
   for n <- 0..31 do
-    defp i(unquote(:binary.at(@crockford_alphabet, n))), do: unquote(n)
+    defp i(unquote(:binary.at(ULID.crockford_alphabet(), n))), do: unquote(n)
   end
 
   defp i(_), do: throw(:error)
