@@ -13,6 +13,7 @@ defmodule Ecto.ULID.Mixfile do
       package: package(),
       source_url: "https://github.com/oviceinc/ecto-ulid",
       homepage_url: "https://github.com/oviceinc/ecto-ulid",
+      aliases: aliases(),
       docs: [main: "Ecto.ULID"]
     ]
   end
@@ -44,7 +45,7 @@ defmodule Ecto.ULID.Mixfile do
   defp aliases do
     [
       fmt:
-        "format --check-formatted mix.exs 'lib/**/*.{ex,exs}' 'test/**/*.{ex,exs}' 'priv/**/*.{ex,exs}' 'config/*.{ex,exs}'"
+        "format --check-formatted mix.exs 'lib/**/*.{ex,exs}' 'test/**/*.{ex,exs}' 'config/*.{ex,exs}'"
     ]
   end
 end
