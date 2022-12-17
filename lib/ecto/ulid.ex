@@ -153,6 +153,17 @@ defmodule Ecto.ULID do
     with {:ok, uuid} <- Encoder.encode_uuid(text), do: uuid
   end
 
+  @doc """
+  Convert a ULID from its UUID from
+  """
+  @spec from_uuid(uuid()) :: t() | :error
+  def from_uuid(<<_::unsigned-size(288)>> = text) do
+    with {:ok, bytes} <- Decoder.decode_uuid(text),
+         {:ok, ulid} <- Encoder.encode(bytes) do
+      ulid
+    end
+  end
+
   # credo:disable-for-next-line
   defp valid?(
          <<c1::8, c2::8, c3::8, c4::8, c5::8, c6::8, c7::8, c8::8, c9::8, c10::8, c11::8, c12::8,

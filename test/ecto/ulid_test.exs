@@ -93,6 +93,14 @@ defmodule Ecto.ULIDTest do
     end
   end
 
+  describe "from_uuid/1" do
+    test "converts ulid to uuid" do
+      ulid = Ecto.ULID.uuid_generate(@timestamp) |> Ecto.ULID.from_uuid()
+      assert String.length(ulid) == 26
+      assert binary_part(ulid, 0, 10) == "01ARYZ6S41"
+    end
+  end
+
   describe "cast/1" do
     test "returns valid ULID" do
       {:ok, ulid} = Ecto.ULID.cast(@encoded)
