@@ -5,11 +5,12 @@ defmodule Ecto.ULIDTest do
   @encoded "01BZ13RV29T5S8HV45EDNC748P"
   @encoded_uuid "015fc23c-6c49-d172-88ec-85736ac39116"
 
+  @timestamp 1_469_918_176_385
+
   describe "generate/0" do
     test "encodes milliseconds in first 10 characters" do
       # test case from ULID README: https://github.com/ulid/javascript#seed-time
-      <<encoded::bytes-size(10), _rest::bytes-size(16)>> = Ecto.ULID.generate(1_469_918_176_385)
-
+      assert <<encoded::bytes-size(10), _rest::bytes-size(16)>> = Ecto.ULID.generate(@timestamp)
       assert encoded == "01ARYZ6S41"
     end
 
@@ -24,8 +25,7 @@ defmodule Ecto.ULIDTest do
   describe "bingenerate/0" do
     test "encodes milliseconds in first 48 bits" do
       now = System.system_time(:millisecond)
-      <<time::48, _random::80>> = Ecto.ULID.bingenerate()
-
+      assert <<time::48, _random::80>> = Ecto.ULID.bingenerate()
       assert_in_delta now, time, 10
     end
 
@@ -34,6 +34,15 @@ defmodule Ecto.ULIDTest do
       ulid2 = Ecto.ULID.bingenerate()
 
       assert ulid1 != ulid2
+    end
+  end
+
+  describe "uuid_generate/0" do
+    test "generates unique identifiers" do
+      uuid1 = Ecto.ULID.uuid_generate()
+      uuid2 = Ecto.ULID.uuid_generate()
+
+      assert uuid1 != uuid2
     end
   end
 

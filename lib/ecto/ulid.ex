@@ -99,9 +99,9 @@ defmodule Ecto.ULID do
 
   * `timestamp`: A Unix timestamp with millisecond precision.
   """
-  @spec generate(integer()) :: t()
+  @spec generate(none() | integer()) :: t()
   def generate(timestamp \\ System.system_time(:millisecond)) do
-    {:ok, ulid} = Encoder.encode(bingenerate(timestamp))
+    {:ok, ulid} = timestamp |> bingenerate() |> Encoder.encode()
     ulid
   end
 
@@ -115,9 +115,15 @@ defmodule Ecto.ULID do
 
   * `timestamp`: A Unix timestamp with millisecond precision.
   """
-  @spec bingenerate(integer()) :: raw()
+  @spec bingenerate(none() | integer()) :: raw()
   def bingenerate(timestamp \\ System.system_time(:millisecond)) do
     <<timestamp::unsigned-size(48), :crypto.strong_rand_bytes(10)::binary>>
+  end
+
+  @spec uuid_generate(none() | integer()) :: uuid()
+  def uuid_generate(timestamp \\ System.system_time(:millisecond)) do
+    {:ok, uuid} = timestamp |> bingenerate() |> Encoder.encode_uuid()
+    uuid
   end
 
   # credo:disable-for-next-line
