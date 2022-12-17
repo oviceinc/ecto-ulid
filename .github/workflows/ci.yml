@@ -11,6 +11,16 @@ env:
 jobs:
   test:
     name: Unit tests
+    strategy:
+      fail-fast: true
+      matrix:
+        elixir:
+          - 1.14.2
+          - 1.13.4
+        erlang:
+          - 25.2
+          - 24.3
+
     runs-on: ubuntu-latest
 
     steps:
@@ -31,8 +41,8 @@ jobs:
       - name: Setup Elixir
         uses: erlef/setup-beam@v1
         with:
-          otp-version: "25.1.2"
-          elixir-version: "1.14.2"
+          otp-version: ${{ matrix.erlang }}
+          elixir-version: ${{ matrix.elixir }}
 
       - name: Install dependencies
         run: |
@@ -110,3 +120,36 @@ jobs:
 
       - name: Run Linter
         run: mix credo
+
+  dialyzer:
+    name: Dialyzer
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Dependency cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: mix-dev-dialyzer-${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            mix-dev-dialyzer-${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
+            mix-dev-dialyzer-${{ runner.os }}-
+            mix-dev-dialyzer-
+
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "25.1.2"
+          elixir-version: "1.14.2"
+
+      - name: Install dependencies
+        run: |
+          mix deps.get
+          mix deps.compile
+
+      - name: Run Dialyzer
+        run: mix dialyzer
