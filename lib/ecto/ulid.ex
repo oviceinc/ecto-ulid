@@ -52,9 +52,8 @@ defmodule Ecto.ULID do
   end
 
   def cast(<<_::unsigned-size(@uuid_bit_size)>> = value) do
-    with {:ok, uuid} <- Ecto.UUID.cast(value) do
-      {:ok, from_uuid(uuid)}
-    else
+    case Ecto.UUID.cast(value) do
+      {:ok, uuid} -> {:ok, from_uuid(uuid)}
       :error -> :error
     end
   end
