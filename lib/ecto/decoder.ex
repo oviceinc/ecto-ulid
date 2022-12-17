@@ -18,6 +18,23 @@ defmodule Ecto.ULID.Decoder do
 
   def decode(_), do: :error
 
+  @spec decode_uuid(ULID.uuid()) :: {:ok, ULID.raw()} | :error
+  def decode_uuid(
+        <<a1, a2, a3, a4, a5, a6, a7, a8, ?-, b1, b2, b3, b4, ?-, c1, c2, c3, c4, ?-, d1, d2, d3,
+          d4, ?-, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12>>
+      ) do
+    try do
+      <<d(a1)::4, d(a2)::4, d(a3)::4, d(a4)::4, d(a5)::4, d(a6)::4, d(a7)::4, d(a8)::4, d(b1)::4,
+        d(b2)::4, d(b3)::4, d(b4)::4, d(c1)::4, d(c2)::4, d(c3)::4, d(c4)::4, d(d1)::4, d(d2)::4,
+        d(d3)::4, d(d4)::4, d(e1)::4, d(e2)::4, d(e3)::4, d(e4)::4, d(e5)::4, d(e6)::4, d(e7)::4,
+        d(e8)::4, d(e9)::4, d(e10)::4, d(e11)::4, d(e12)::4>>
+    catch
+      :error -> :error
+    else
+      bin -> {:ok, bin}
+    end
+  end
+
   defp decode_bytes(<<>>, <<_::2, shifted::bitstring>>), do: shifted
 
   defp decode_bytes(<<codepoint::unsigned, rest::bitstring>>, acc) do
