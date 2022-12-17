@@ -6,6 +6,9 @@ defmodule Ecto.ULID do
   alias Ecto.ULID.{Encoder, Decoder}
 
   @crockford_alphabet "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+  @ulid_bit_size 208
+  @ulid_raw_bit_size 128
+  @uuid_bit_size 288
 
   # replace with `use Ecto.Type` after Ecto 3.2.0 is required
   @behaviour Ecto.Type
@@ -40,7 +43,7 @@ defmodule Ecto.ULID do
   Casts a string (including a UUID hex string) to ULID.
   """
   @spec cast(binary() | uuid()) :: {:ok, t()} | :error
-  def cast(<<_::bytes-size(26)>> = value) do
+  def cast(<<_::unsigned-size(@ulid_bit_size)>> = value) do
     if valid?(value) do
       {:ok, value}
     else
@@ -48,11 +51,9 @@ defmodule Ecto.ULID do
     end
   end
 
-  def cast(<<_::bytes-size(36)>> = value) do
-    with {:ok, hex_uuid} <- Ecto.UUID.cast(value),
-         {:ok, decoded} <- dump(hex_uuid),
-         {:ok, ulid} <- load(decoded) do
-      {:ok, ulid}
+  def cast(<<_::unsigned-size(@uuid_bit_size)>> = value) do
+    with {:ok, uuid} <- Ecto.UUID.cast(value) do
+      {:ok, from_uuid(uuid)}
     else
       :error -> :error
     end
@@ -75,14 +76,14 @@ defmodule Ecto.ULID do
   Converts a Crockford Base32 or UUID hex encoded ULID  into a binary.
   """
   @spec dump(t() | uuid()) :: {:ok, raw()} | :error
-  def dump(<<_::bytes-size(26)>> = encoded), do: Decoder.decode(encoded)
+  def dump(<<_::unsigned-size(@ulid_bit_size)>> = encoded), do: Decoder.decode(encoded)
   defdelegate dump(encoded), to: Ecto.UUID
 
   @doc """
   Converts a binary ULID into a Crockford Base32 encoded string.
   """
   @spec load(raw()) :: {:ok, t()} | :error
-  def load(<<_::unsigned-size(128)>> = bytes), do: Encoder.encode(bytes)
+  def load(<<_::unsigned-size(@ulid_raw_bit_size)>> = bytes), do: Encoder.encode(bytes)
   def load(_), do: :error
 
   @doc false
@@ -130,11 +131,11 @@ defmodule Ecto.ULID do
   Extracts the timestamp from a ULID
   """
   @spec extract_timestamp(raw() | t() | uuid()) :: integer() | :error
-  def extract_timestamp(<<_::unsigned-size(208)>> = text) do
+  def extract_timestamp(<<_::unsigned-size(@ulid_bit_size)>> = text) do
     with {:ok, bytes} <- Decoder.decode(text), do: extract_timestamp(bytes)
   end
 
-  def extract_timestamp(<<_::unsigned-size(288)>> = text) do
+  def extract_timestamp(<<_::unsigned-size(@uuid_bit_size)>> = text) do
     with {:ok, bytes} <- Decoder.decode_uuid(text), do: extract_timestamp(bytes)
   end
 
@@ -145,11 +146,11 @@ defmodule Ecto.ULID do
   Convert a ULID to its UUID form
   """
   @spec to_uuid(t() | raw()) :: uuid() | :error
-  def to_uuid(<<_::unsigned-size(208)>> = text) do
+  def to_uuid(<<_::unsigned-size(@ulid_bit_size)>> = text) do
     with {:ok, bytes} <- Decoder.decode(text), do: to_uuid(bytes)
   end
 
-  def to_uuid(<<_::unsigned-size(128)>> = text) do
+  def to_uuid(<<_::unsigned-size(@ulid_raw_bit_size)>> = text) do
     with {:ok, uuid} <- Encoder.encode_uuid(text), do: uuid
   end
 
@@ -157,7 +158,7 @@ defmodule Ecto.ULID do
   Convert a ULID from its UUID from
   """
   @spec from_uuid(uuid()) :: t() | :error
-  def from_uuid(<<_::unsigned-size(288)>> = text) do
+  def from_uuid(<<_::unsigned-size(@uuid_bit_size)>> = text) do
     with {:ok, bytes} <- Decoder.decode_uuid(text),
          {:ok, ulid} <- Encoder.encode(bytes) do
       ulid

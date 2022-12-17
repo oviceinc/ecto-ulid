@@ -5,8 +5,10 @@ defmodule Ecto.ULID.Decoder do
 
   alias Ecto.ULID
 
+  @ulid_bit_size 208
+
   @spec decode(ULID.t()) :: {:ok, ULID.raw()} | :error
-  def decode(<<_::unsigned-size(208)>> = text) do
+  def decode(<<_::unsigned-size(@ulid_bit_size)>> = text) do
     decode_bytes(text, <<>>)
   catch
     :error -> :error

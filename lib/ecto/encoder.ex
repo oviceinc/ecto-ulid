@@ -5,6 +5,8 @@ defmodule Ecto.ULID.Encoder do
 
   alias Ecto.ULID
 
+  @ulid_raw_bit_size 128
+
   @doc """
   Encodes a Ulid binary to its textual form.
 
@@ -15,7 +17,7 @@ defmodule Ecto.ULID.Encoder do
       {:ok, "01GMF0H6YQQ0NKGVR3ZAFYSWY0"}
   """
   @spec encode(ULID.raw()) :: {:ok, ULID.t()} | :error
-  def encode(<<_::unsigned-size(128)>> = bytes) do
+  def encode(<<_::unsigned-size(@ulid_raw_bit_size)>> = bytes) do
     encode_bytes(<<0::2, bytes::binary>>, <<>>)
   catch
     _ -> :error
