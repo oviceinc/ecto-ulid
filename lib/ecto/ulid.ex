@@ -126,6 +126,21 @@ defmodule Ecto.ULID do
     uuid
   end
 
+  @doc """
+  Extracts the timestamp from a ULID
+  """
+  @spec extract_timestamp(raw() | t() | uuid()) :: integer() | :error
+  def extract_timestamp(<<_::unsigned-size(208)>> = text) do
+    with {:ok, bytes} <- Decoder.decode(text), do: extract_timestamp(bytes)
+  end
+
+  def extract_timestamp(<<_::unsigned-size(288)>> = text) do
+    with {:ok, bytes} <- Decoder.decode_uuid(text), do: extract_timestamp(bytes)
+  end
+
+  def extract_timestamp(<<timestamp::unsigned-size(48), _rest::unsigned-size(80)>>),
+    do: timestamp
+
   # credo:disable-for-next-line
   defp valid?(
          <<c1::8, c2::8, c3::8, c4::8, c5::8, c6::8, c7::8, c8::8, c9::8, c10::8, c11::8, c12::8,

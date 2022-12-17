@@ -62,6 +62,23 @@ defmodule Ecto.ULIDTest do
     end
   end
 
+  describe "extract_timestamp/1" do
+    test "extracts a timestamp from a text ulid" do
+      ulid = "01ARYZ6S4124TJP2BQQZX06FKM"
+      assert Ecto.ULID.extract_timestamp(ulid) == 1_469_918_176_385
+    end
+
+    test "extracts a timestamp from a raw ulid" do
+      ulid = <<1, 86, 61, 243, 100, 129, 149, 125, 206, 44, 55, 150, 198, 186, 71, 79>>
+      assert Ecto.ULID.extract_timestamp(ulid) == 1_469_918_176_385
+    end
+
+    test "extracts a timestamp from a uuid ulid" do
+      uuid = "01563df3-6481-957d-ce2c-3796c6ba474f"
+      assert Ecto.ULID.extract_timestamp(uuid) == 1_469_918_176_385
+    end
+  end
+
   describe "cast/1" do
     test "returns valid ULID" do
       {:ok, ulid} = Ecto.ULID.cast(@encoded)
