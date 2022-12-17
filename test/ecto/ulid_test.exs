@@ -65,17 +65,31 @@ defmodule Ecto.ULIDTest do
   describe "extract_timestamp/1" do
     test "extracts a timestamp from a text ulid" do
       ulid = "01ARYZ6S4124TJP2BQQZX06FKM"
-      assert Ecto.ULID.extract_timestamp(ulid) == 1_469_918_176_385
+      assert Ecto.ULID.extract_timestamp(ulid) == @timestamp
     end
 
     test "extracts a timestamp from a raw ulid" do
       ulid = <<1, 86, 61, 243, 100, 129, 149, 125, 206, 44, 55, 150, 198, 186, 71, 79>>
-      assert Ecto.ULID.extract_timestamp(ulid) == 1_469_918_176_385
+      assert Ecto.ULID.extract_timestamp(ulid) == @timestamp
     end
 
     test "extracts a timestamp from a uuid ulid" do
       uuid = "01563df3-6481-957d-ce2c-3796c6ba474f"
-      assert Ecto.ULID.extract_timestamp(uuid) == 1_469_918_176_385
+      assert Ecto.ULID.extract_timestamp(uuid) == @timestamp
+    end
+  end
+
+  describe "to_uuid/1" do
+    test "converts ULID to UUID" do
+      uuid = Ecto.ULID.generate(@timestamp) |> Ecto.ULID.to_uuid()
+      assert String.length(uuid) == 36
+      assert binary_part(uuid, 0, 8) == "01563df3"
+    end
+
+    test "converts raw ulid to uuid" do
+      uuid = Ecto.ULID.bingenerate(@timestamp) |> Ecto.ULID.to_uuid()
+      assert String.length(uuid) == 36
+      assert binary_part(uuid, 0, 8) == "01563df3"
     end
   end
 
