@@ -14,7 +14,8 @@ defmodule Ecto.ULID.Mixfile do
       source_url: "https://github.com/oviceinc/ecto-ulid",
       homepage_url: "https://github.com/oviceinc/ecto-ulid",
       aliases: aliases(),
-      docs: [main: "Ecto.ULID"]
+      docs: [main: "Ecto.ULID"],
+      dialyzer: [plt_add_apps: [:mix]]
     ]
   end
 
@@ -37,8 +38,9 @@ defmodule Ecto.ULID.Mixfile do
       {:ecto, "~> 2.0 or ~> 3.0"},
       {:benchfella, "~> 0.3.5", only: [:dev, :test]},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      # linter
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
+      # sanity checks
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 
