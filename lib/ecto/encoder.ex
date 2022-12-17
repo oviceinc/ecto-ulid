@@ -68,4 +68,5 @@ defmodule Ecto.ULID.Encoder do
   defp e(13), do: ?d
   defp e(14), do: ?e
   defp e(15), do: ?f
+  defp e(_), do: :error
 end
