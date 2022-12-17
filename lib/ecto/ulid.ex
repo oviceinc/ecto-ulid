@@ -3,6 +3,8 @@ defmodule Ecto.ULID do
   An Ecto type for ULID strings.
   """
 
+  use Ecto.Type
+
   alias Ecto.ULID.{Encoder, Decoder}
 
   @crockford_alphabet "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
@@ -10,8 +12,6 @@ defmodule Ecto.ULID do
   @ulid_raw_bit_size 128
   @uuid_bit_size 288
 
-  # replace with `use Ecto.Type` after Ecto 3.2.0 is required
-  @behaviour Ecto.Type
   # and remove both of these functions
   def embed_as(_), do: :self
   def equal?(term1, term2), do: term1 == term2

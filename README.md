@@ -3,7 +3,7 @@
 An `Ecto.Type` implementation of [ULID](https://github.com/ulid/spec).
 
 `Ecto.ULID` should be compatible anywhere that `Ecto.UUID` is supported. It has been confirmed to
-work with PostgreSQL and MySQL on Ecto 2.x and 3.x.  Ecto 1.x is *not* supported.
+work with PostgreSQL and MySQL on 3.x. Older versions of Ecto are *not* supported.
 
 ULID is a 128-bit universally unique lexicographically sortable identifier. ULID is
 binary-compatible with UUID, so it can be stored in a `uuid` column in a database.
@@ -15,8 +15,8 @@ binary-compatible with UUID, so it can be stored in a `uuid` column in a databas
 * Autogenerate ULID when used as a primary key.
 * Supports reading and writing ULID in a database backed by its native `uuid` type (no database
   extensions required).
-* Supports Ecto 2.x and Ecto 3.x.
-* Supports Elixir 1.4 and newer.
+* Supports Ecto 3.x.
+* Supports Elixir 1.14 and newer.
 * Confirmed working on PostgreSQL and MySQL.
 * Optimized for high throughput.
 
@@ -45,7 +45,11 @@ generate/0        1000000   1.55 µs/op
 Usage is very similar to `Ecto.UUID`. The following example shows how to use `Ecto.ULID` as a
 primary key in a database table, but it can be used for other columns just as easily.
 
-[API documentation](https://hexdocs.pm/ecto_ulid) is available on hexdocs.
+You can see the API docs by running the following command locally.
+
+``` sh
+mix docs --open
+```
 
 ### Install
 
@@ -54,7 +58,7 @@ Install `ecto_ulid` from Hex by adding it to the dependencies in `mix.exs`:
 ```elixir
 defp deps do
   [
-    {:ecto_ulid, "~> 0.2.0"}
+    {:ecto_ulid, "~> 0.4.0"}
   ]
 end
 ```
@@ -121,6 +125,6 @@ the [API documentation](https://hexdocs.pm/ecto_ulid) for more details.
 
 ## License
 
-Copyright © 2018 The RealReal, Inc.
+Copyright © 2022 oVice, Inc.
 
 Distributed under the [MIT License](./LICENSE).
