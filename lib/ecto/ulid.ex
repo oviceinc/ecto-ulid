@@ -39,6 +39,7 @@ defmodule Ecto.ULID do
   @doc """
   Casts a string (including a UUID hex string) to ULID.
   """
+  @spec cast(binary() | uuid()) :: {:ok, t()} | :error
   def cast(<<_::bytes-size(26)>> = value) do
     if valid?(value) do
       {:ok, value}
@@ -62,6 +63,7 @@ defmodule Ecto.ULID do
   @doc """
   Same as `cast/1` but raises `Ecto.CastError` on invalid arguments.
   """
+  @spec cast!(binary() | uuid()) :: t()
   def cast!(value) do
     case cast(value) do
       {:ok, ulid} -> ulid
@@ -72,16 +74,19 @@ defmodule Ecto.ULID do
   @doc """
   Converts a Crockford Base32 or UUID hex encoded ULID  into a binary.
   """
+  @spec dump(t() | uuid()) :: {:ok, raw()} | :error
   def dump(<<_::bytes-size(26)>> = encoded), do: Decoder.decode(encoded)
   defdelegate dump(encoded), to: Ecto.UUID
 
   @doc """
   Converts a binary ULID into a Crockford Base32 encoded string.
   """
+  @spec load(raw()) :: {:ok, t()} | :error
   def load(<<_::unsigned-size(128)>> = bytes), do: Encoder.encode(bytes)
   def load(_), do: :error
 
   @doc false
+  @spec autogenerate :: t()
   def autogenerate, do: generate()
 
   @doc """
@@ -94,6 +99,7 @@ defmodule Ecto.ULID do
 
   * `timestamp`: A Unix timestamp with millisecond precision.
   """
+  @spec generate(integer()) :: t()
   def generate(timestamp \\ System.system_time(:millisecond)) do
     {:ok, ulid} = Encoder.encode(bingenerate(timestamp))
     ulid
@@ -109,6 +115,7 @@ defmodule Ecto.ULID do
 
   * `timestamp`: A Unix timestamp with millisecond precision.
   """
+  @spec bingenerate(integer()) :: raw()
   def bingenerate(timestamp \\ System.system_time(:millisecond)) do
     <<timestamp::unsigned-size(48), :crypto.strong_rand_bytes(10)::binary>>
   end
@@ -129,37 +136,9 @@ defmodule Ecto.ULID do
 
   @compile {:inline, v: 1}
 
-  defp v(?0), do: true
-  defp v(?1), do: true
-  defp v(?2), do: true
-  defp v(?3), do: true
-  defp v(?4), do: true
-  defp v(?5), do: true
-  defp v(?6), do: true
-  defp v(?7), do: true
-  defp v(?8), do: true
-  defp v(?9), do: true
-  defp v(?A), do: true
-  defp v(?B), do: true
-  defp v(?C), do: true
-  defp v(?D), do: true
-  defp v(?E), do: true
-  defp v(?F), do: true
-  defp v(?G), do: true
-  defp v(?H), do: true
-  defp v(?J), do: true
-  defp v(?K), do: true
-  defp v(?M), do: true
-  defp v(?N), do: true
-  defp v(?P), do: true
-  defp v(?Q), do: true
-  defp v(?R), do: true
-  defp v(?S), do: true
-  defp v(?T), do: true
-  defp v(?V), do: true
-  defp v(?W), do: true
-  defp v(?X), do: true
-  defp v(?Y), do: true
-  defp v(?Z), do: true
+  for n <- 0..31 do
+    defp v(unquote(:binary.at(@crockford_alphabet, n))), do: true
+  end
+
   defp v(_), do: false
 end
