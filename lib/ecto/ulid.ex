@@ -3,6 +3,8 @@ defmodule Ecto.ULID do
   An Ecto type for ULID strings.
   """
 
+  alias Ecto.ULID.Encoder
+
   # replace with `use Ecto.Type` after Ecto 3.2.0 is required
   @behaviour Ecto.Type
   # and remove both of these functions
@@ -10,9 +12,19 @@ defmodule Ecto.ULID do
   def equal?(term1, term2), do: term1 == term2
 
   @typedoc """
-  A hex-encoded ULID string.
+  An Crockford 32 encoded ULID string
   """
   @type t :: <<_::208>>
+
+  @typedoc """
+  A raw binary representation of a ULID
+  """
+  @type raw :: <<_::128>>
+
+  @typedoc """
+  A UUID representation of a ULID
+  """
+  @type uuid :: <<_::288>>
 
   @doc """
   The underlying schema type.
@@ -61,7 +73,7 @@ defmodule Ecto.ULID do
   @doc """
   Converts a binary ULID into a Crockford Base32 encoded string.
   """
-  def load(<<_::unsigned-size(128)>> = bytes), do: encode(bytes)
+  def load(<<_::unsigned-size(128)>> = bytes), do: Encoder.encode(bytes)
   def load(_), do: :error
 
   @doc false
@@ -78,7 +90,7 @@ defmodule Ecto.ULID do
   * `timestamp`: A Unix timestamp with millisecond precision.
   """
   def generate(timestamp \\ System.system_time(:millisecond)) do
-    {:ok, ulid} = encode(bingenerate(timestamp))
+    {:ok, ulid} = Encoder.encode(bingenerate(timestamp))
     ulid
   end
 
@@ -95,57 +107,6 @@ defmodule Ecto.ULID do
   def bingenerate(timestamp \\ System.system_time(:millisecond)) do
     <<timestamp::unsigned-size(48), :crypto.strong_rand_bytes(10)::binary>>
   end
-
-  defp encode(
-         <<b1::3, b2::5, b3::5, b4::5, b5::5, b6::5, b7::5, b8::5, b9::5, b10::5, b11::5, b12::5,
-           b13::5, b14::5, b15::5, b16::5, b17::5, b18::5, b19::5, b20::5, b21::5, b22::5, b23::5,
-           b24::5, b25::5, b26::5>>
-       ) do
-    <<e(b1), e(b2), e(b3), e(b4), e(b5), e(b6), e(b7), e(b8), e(b9), e(b10), e(b11), e(b12),
-      e(b13), e(b14), e(b15), e(b16), e(b17), e(b18), e(b19), e(b20), e(b21), e(b22), e(b23),
-      e(b24), e(b25), e(b26)>>
-  catch
-    :error -> :error
-  else
-    encoded -> {:ok, encoded}
-  end
-
-  defp encode(_), do: :error
-
-  @compile {:inline, e: 1}
-
-  defp e(0), do: ?0
-  defp e(1), do: ?1
-  defp e(2), do: ?2
-  defp e(3), do: ?3
-  defp e(4), do: ?4
-  defp e(5), do: ?5
-  defp e(6), do: ?6
-  defp e(7), do: ?7
-  defp e(8), do: ?8
-  defp e(9), do: ?9
-  defp e(10), do: ?A
-  defp e(11), do: ?B
-  defp e(12), do: ?C
-  defp e(13), do: ?D
-  defp e(14), do: ?E
-  defp e(15), do: ?F
-  defp e(16), do: ?G
-  defp e(17), do: ?H
-  defp e(18), do: ?J
-  defp e(19), do: ?K
-  defp e(20), do: ?M
-  defp e(21), do: ?N
-  defp e(22), do: ?P
-  defp e(23), do: ?Q
-  defp e(24), do: ?R
-  defp e(25), do: ?S
-  defp e(26), do: ?T
-  defp e(27), do: ?V
-  defp e(28), do: ?W
-  defp e(29), do: ?X
-  defp e(30), do: ?Y
-  defp e(31), do: ?Z
 
   defp decode(
          <<c1::8, c2::8, c3::8, c4::8, c5::8, c6::8, c7::8, c8::8, c9::8, c10::8, c11::8, c12::8,
