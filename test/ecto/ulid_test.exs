@@ -20,6 +20,14 @@ defmodule Ecto.ULIDTest do
 
       assert ulid1 != ulid2
     end
+
+    test "should be sortable" do
+      ulid1 = Ecto.ULID.generate()
+      Process.sleep(1)
+      ulid2 = Ecto.ULID.generate()
+
+      assert ulid2 > ulid1
+    end
   end
 
   describe "bingenerate/0" do
@@ -43,6 +51,14 @@ defmodule Ecto.ULIDTest do
       uuid2 = Ecto.ULID.uuid_generate()
 
       assert uuid1 != uuid2
+    end
+
+    test "should be sortable" do
+      uuid1 = Ecto.ULID.uuid_generate()
+      Process.sleep(1)
+      uuid2 = Ecto.ULID.uuid_generate()
+
+      assert uuid2 > uuid1
     end
   end
 
