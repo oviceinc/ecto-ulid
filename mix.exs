@@ -4,8 +4,8 @@ defmodule Ecto.ULID.Mixfile do
   def project do
     [
       app: :ecto_ulid,
-      version: "0.3.0",
-      elixir: "~> 1.4",
+      version: "0.4.0",
+      elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "Ecto.ULID",
@@ -35,7 +35,7 @@ defmodule Ecto.ULID.Mixfile do
 
   defp deps do
     [
-      {:ecto, "~> 2.0 or ~> 3.0"},
+      {:ecto, "~> 3.2"},
       {:benchfella, "~> 0.3.5", only: [:dev, :test]},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       # sanity checks
