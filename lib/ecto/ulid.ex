@@ -87,7 +87,7 @@ defmodule Ecto.ULID do
 
   @doc false
   @spec autogenerate :: t()
-  def autogenerate, do: generate()
+  def autogenerate, do: uuid_generate()
 
   @doc """
   Generates a Crockford Base32 encoded ULID.
